@@ -1,6 +1,6 @@
 /*** 
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-17 20:22:30
+ * @LastEditTime : 2022-02-17 22:20:00
  * @LastEditors  : KnightZJ
  * @Description  : poker header file
  */
@@ -65,6 +65,59 @@ int count_single_card(CardsGroup cardsgroup, CardType cardtype);
  */
 int count_all_cards(CardsGroup cardsgroup);
 
+/*** 
+ * @description: judge if we can take {num} specified card(s) from the given cards group
+ * @param      {CardsGroup} the given cards group
+ * @param      {CardType} type of the specified card
+ * @param      {int} the number of the cards to take
+ * @return     {int} return none zero value if the card(s) can be successfully taken
+ */
+int can_take_card(CardsGroup cardsgroup, CardType cardtype, int num);
 
+/*** 
+ * @description: take {num} specified card(s) from the given cards group
+ * @param      {CardsGroup*} the given cards group
+ * @param      {CardType} type of the specified card
+ * @param      {int} the number of the cards to take
+ * @return     {int} return none zero value if the card(s) are successfully taken
+ */
+int take_card(CardsGroup* cardsgroup, CardType cardtype, int num);
 
+/*** 
+ * @description: judge if we can add {num} specified card(s) from the given cards group
+ * @param      {CardsGroup} the given cards group
+ * @param      {CardType} type of the specified card
+ * @param      {int} the number of the cards to add
+ * @return     {int} return none zero value if the card(s) can be successfully added
+ */
+int can_add_card(CardsGroup cardsgroup, CardType cardtype, int num);
+
+/*** 
+ * @description: add {num} specified card(s) from the given cards group
+ * @param      {CardsGroup*} the given cards group
+ * @param      {CardType} type of the specified card
+ * @param      {int} the number of the cards to add
+ * @return     {int} return none zero value if the card(s) are successfully added
+ */
+int add_card(CardsGroup* cardsgroup, CardType cardtype, int num);
+
+/*** 
+ * @description: judge if we can move {num} specified card(s) from source to dest
+ * @param      {CardsGroup} dest
+ * @param      {CardsGroup} source
+ * @param      {CardType} cardtype
+ * @param      {int} the number of the cards to move
+ * @return     {int} return none zero value if the card(s) can be successfully moved
+ */
+int can_move_card(CardsGroup dest, CardsGroup source, CardType cardtype, int num);
+
+/*** 
+ * @description: move {num} specified card(s) from source to dest
+ * @param      {CardsGroup*} dest
+ * @param      {CardsGroup*} source
+ * @param      {CardType} cardtype
+ * @param      {int} the number of the cards to move
+ * @return     {int} return none zero value if the card(s) are successfully moved
+ */
+int move_card(CardsGroup* dest, CardsGroup* source, CardType cardtype, int num);
 
