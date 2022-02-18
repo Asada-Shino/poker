@@ -1,6 +1,6 @@
 /*
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-18 19:00:17
+ * @LastEditTime : 2022-02-18 19:58:47
  * @LastEditors  : KnightZJ
  * @Description  : poker source file
  */
@@ -61,6 +61,14 @@ const char* strCardGroupType[15] = {
     "飞机✈",
     "飞机✈带单",
     "飞机✈带双"
+};
+
+const char* strJudgeRes[5] = {
+    "牌型不一致",
+    "非法牌型",
+    "压得过",
+    "压不过",
+    "未知错误"
 };
 
 int count_single_card(CardsGroup cardsgroup, CardType cardtype) {
@@ -190,4 +198,26 @@ CardsGroupInfo get_cards_info(CardsGroup cards) {
             break;
     }
     return (CardsGroupInfo){.type = cg_Invalid};
+}
+
+JudgeRes judge(CardsGroup last, CardsGroup challenger) {
+    CardsGroupInfo last_info = get_cards_info(last), challenger_info = get_cards_info(challenger);
+    if(last_info.type == cg_Invalid)
+        return jr_Unexpected;
+    if(challenger_info.type == cg_Invalid)
+        return jr_InvalidInput;
+    if(last_info.type == cg_KingBomb)
+        return jr_Smaller;
+    if(challenger_info.type == cg_KingBomb)
+        return jr_Bigger;
+    if(challenger_info.type == cg_Bomb) {
+        if(last_info.type == cg_Bomb)
+            return challenger_info.sequence > last_info.sequence ? jr_Bigger : jr_Smaller;
+        return jr_Bigger;
+    }
+    if(challenger_info.type != last_info.type)
+        return jr_WrongMatch;
+    if(challenger_info.sequence_cnt != last_info.sequence_cnt)
+        return jr_WrongMatch;
+    return challenger_info.sequence > last_info.sequence ? jr_Bigger : jr_Smaller; 
 }

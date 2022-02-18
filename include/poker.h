@@ -1,6 +1,6 @@
 /*** 
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-18 18:51:32
+ * @LastEditTime : 2022-02-18 20:04:43
  * @LastEditors  : KnightZJ
  * @Description  : poker header file
  */
@@ -46,6 +46,14 @@ typedef enum CardsGroupType {
     cg_AirplaneWithDoubles
 }CardsGroupType;
 
+typedef enum JudgeRes {
+    jr_WrongMatch,
+    jr_InvalidInput,
+    jr_Bigger,
+    jr_Smaller,
+    jr_Unexpected
+}JudgeRes;
+
 typedef struct CardsGroupInfo {
     CardsGroupType type;
     int sequence_cnt;
@@ -58,7 +66,7 @@ extern const CardsGroup cgCardNumMask[5];
 extern const CardsGroup cgCardsRowMask[4];
 extern const char* strCardType[15];
 extern const char* strCardGroupType[15];
-
+extern const char* strJudgeRes[5];
 /*** 
  * @description: count the number of a specified card in the given cards group
  * @param      {CardsGroup} the given cards group
@@ -136,3 +144,11 @@ int move_card(CardsGroup* dest, CardsGroup* source, CardType cardtype, int num);
  * @return     {CardsGroupInfo}
  */
 CardsGroupInfo get_cards_info(CardsGroup cards);
+
+/*** 
+ * @description: judge if {challenger} is bigger than {last}
+ * @param      {CardsGroup} last
+ * @param      {CardsGroup} challenger
+ * @return     {JudgeRes} return Bigger if {challenger} is valid and really bigger than {last}
+ */
+JudgeRes judge(CardsGroup last, CardsGroup challenger);
