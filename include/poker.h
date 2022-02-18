@@ -1,6 +1,6 @@
 /*** 
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-17 22:20:00
+ * @LastEditTime : 2022-02-18 18:51:32
  * @LastEditors  : KnightZJ
  * @Description  : poker header file
  */
@@ -28,10 +28,6 @@ typedef enum CardType {
     c_RedJoker
 }CardType;
 
-extern const Card cSingle[15];
-extern const char* strCardType[15];
-const char* strCardGroupType[15];
-
 typedef enum CardsGroupType {
     cg_Invalid,
     cg_Single,
@@ -49,6 +45,19 @@ typedef enum CardsGroupType {
     cg_AirplaneWithSingles,
     cg_AirplaneWithDoubles
 }CardsGroupType;
+
+typedef struct CardsGroupInfo {
+    CardsGroupType type;
+    int sequence_cnt;
+    CardsGroup sequence;
+}CardsGroupInfo;
+
+extern const Card cSingle[15];
+extern const CardsGroup cgSingleCardMask[15];
+extern const CardsGroup cgCardNumMask[5];
+extern const CardsGroup cgCardsRowMask[4];
+extern const char* strCardType[15];
+extern const char* strCardGroupType[15];
 
 /*** 
  * @description: count the number of a specified card in the given cards group
@@ -121,3 +130,9 @@ int can_move_card(CardsGroup dest, CardsGroup source, CardType cardtype, int num
  */
 int move_card(CardsGroup* dest, CardsGroup* source, CardType cardtype, int num);
 
+/*** 
+ * @description: get the cardstype and max sequence (if it has)
+ * @param      {CardsGroup} cards
+ * @return     {CardsGroupInfo}
+ */
+CardsGroupInfo get_cards_info(CardsGroup cards);
