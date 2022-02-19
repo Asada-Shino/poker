@@ -1,12 +1,13 @@
 /*
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-18 19:58:47
+ * @LastEditTime : 2022-02-19 14:02:52
  * @LastEditors  : KnightZJ
  * @Description  : poker source file
  */
 
 #include "poker.h"
 #include <assert.h>
+#include <stdlib.h>
 
 const Card cSingle[15] = {
     0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000
@@ -221,3 +222,23 @@ JudgeRes judge(CardsGroup last, CardsGroup challenger) {
         return jr_WrongMatch;
     return challenger_info.sequence > last_info.sequence ? jr_Bigger : jr_Smaller; 
 }
+
+int shuffle(Table* table, long seed) {
+    srand(seed);
+    char a[54];
+    for(int i = 0; i < 54; ++i)
+        a[i] = i;
+    for(int i = 0; i < 54; ++i) {
+        int random = i + rand()%(54-i);
+        int num = a[i];
+        a[i] = a[random];
+        a[random] = num;
+    }
+    table->landlord_cards = table->cards[0] = table->cards[1] = table->cards[2] = 0;
+    for(int i = 0; i < 51; ++i)
+        add_card(&table->cards[i/17], a[i] >= 52 ? a[i] - 52 + 13 : a[i] / 4, 1);
+    for(int i = 51; i < 54; ++i)
+        add_card(&table->landlord_cards, a[i] >= 52 ? a[i] - 52 + 13 : a[i] / 4, 1);
+    return 1;
+}
+

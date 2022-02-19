@@ -1,6 +1,6 @@
 /*** 
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-18 20:04:43
+ * @LastEditTime : 2022-02-19 13:58:33
  * @LastEditors  : KnightZJ
  * @Description  : poker header file
  */
@@ -59,6 +59,16 @@ typedef struct CardsGroupInfo {
     int sequence_cnt;
     CardsGroup sequence;
 }CardsGroupInfo;
+
+typedef struct Table {
+    CardsGroup cards[3];
+    CardsGroup landlord_cards;
+    int landlord_id;
+    CardsGroup history[54];
+    int steps;
+    int turn;
+    long seed;
+}Table;
 
 extern const Card cSingle[15];
 extern const CardsGroup cgSingleCardMask[15];
@@ -152,3 +162,11 @@ CardsGroupInfo get_cards_info(CardsGroup cards);
  * @return     {JudgeRes} return Bigger if {challenger} is valid and really bigger than {last}
  */
 JudgeRes judge(CardsGroup last, CardsGroup challenger);
+
+/*** 
+ * @description: generate player's cards
+ * @param      {Table*} table
+ * @param      {long} seed, used by srand
+ * @return     {*} return none zero if successfully shuffled
+ */
+int shuffle(Table* table, long seed);
