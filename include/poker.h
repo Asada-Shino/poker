@@ -1,6 +1,6 @@
 /*** 
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-19 13:58:33
+ * @LastEditTime : 2022-02-20 15:26:19
  * @LastEditors  : KnightZJ
  * @Description  : poker header file
  */
@@ -170,3 +170,11 @@ JudgeRes judge(CardsGroup last, CardsGroup challenger);
  * @return     {*} return none zero if successfully shuffled
  */
 int shuffle(Table* table, long seed);
+
+/*** 
+ * @description: recommend cards that bigger than {last}
+ * @param      {CardsGroup} last
+ * @param      {CardsGroup} hand
+ * @return     {CardsGroup} return 0 if can't find any suitable cards
+ */
+CardsGroup recommend_cards(CardsGroup last, CardsGroup hand, int seconds_limit);

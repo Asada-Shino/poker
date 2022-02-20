@@ -1,6 +1,6 @@
 /*
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-19 14:02:52
+ * @LastEditTime : 2022-02-20 15:33:09
  * @LastEditors  : KnightZJ
  * @Description  : poker source file
  */
@@ -8,6 +8,7 @@
 #include "poker.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 const Card cSingle[15] = {
     0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000
@@ -25,8 +26,10 @@ const CardsGroup cgCardNumMask[5] = {
 };
 
 const CardsGroup cgCardsRowMask[4] = {
-    0xffff, 0xffff0000, 0xffff00000000, 0xffff000000000000
+    0x7fff, 0x1fff0000, 0x1fff00000000, 0x1fff000000000000
 };
+
+const CardsGroup cgFullMask = 0x1fff1fff1fff7fff;
 
 const char* strCardType[15] = {
     "3",
@@ -134,8 +137,13 @@ int check_sequence(CardsGroup cards, int len) {
 }
 
 CardsGroupInfo get_cards_info(CardsGroup cards) {
+    if(cards&~cgFullMask) {
+        return (CardsGroupInfo){.type = cg_Invalid};
+    }
     CardsGroup singles = (cards & cgCardsRowMask[0]), doubles = (cards & cgCardsRowMask[1]) >> 16,
                 threes = (cards & cgCardsRowMask[2]) >> 32, fours = (cards & cgCardsRowMask[3]) >> 48;
+    if(((fours^threes)&fours) || ((threes^doubles)&threes) || ((doubles^singles)&doubles))
+        return (CardsGroupInfo){.type = cg_Invalid};
     singles ^= doubles, doubles ^= threes, threes ^= fours;
     int cnt = count_all_cards(cards), cntSingle = count_all_cards(singles),
         cntDouble = count_all_cards(doubles), cntThree = count_all_cards(threes);
@@ -242,3 +250,70 @@ int shuffle(Table* table, long seed) {
     return 1;
 }
 
+CardsGroup recommend_cards(CardsGroup last, CardsGroup hand, int seconds_limit) {
+    CardsGroupInfo last_info = get_cards_info(last);
+    if(last_info.type == cg_Invalid || last_info.type == cg_KingBomb)
+        return 0;
+    int cnt = count_all_cards(last);
+    CardsGroup res = 0, x = (1ULL<<cnt) - 1, boom_res = 0, max = 0x2000000000000000;
+    time_t start = time(0);
+    while(x < max && time(0) - start <= seconds_limit) {
+        CardsGroup b = x & -x;
+        CardsGroup t = x + b;
+        CardsGroup c = t ^ (t-1);
+        CardsGroup m = (c >> 2) / b;
+        x = t | m;
+        if((x & hand) == x) {
+            switch (judge(last, x)) {
+                case jr_Bigger: {
+                    CardsGroupInfo info = get_cards_info(x);
+                    printf("%lx\t%s\t%d\t%lx\n", x, strCardGroupType[info.type], info.sequence_cnt, info.sequence);
+                    if(res == 0) {
+                        if(info.type != last_info.type) {
+                            if(boom_res==0)
+                                boom_res = x;
+                            else
+                                if(judge(boom_res, x) == jr_Smaller)
+                                    boom_res = x;
+                        }
+                        else {
+                            res = x;
+                        }
+                    }
+                    else {
+                        if(judge(res, x) == jr_Smaller)
+                            res = x;
+                    }
+                    if(info.type != last_info.type) {
+                        if(boom_res==0)
+                            boom_res = x;
+                        else
+                            if(judge(boom_res, x) == jr_Bigger)
+                                boom_res = x;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+        
+    }
+    if(res != 0)
+        return res;
+    if(boom_res != 0)
+        return boom_res;
+    for(int i = 0; i < 13; ++i) {
+        if(can_take_card(hand, i, 4)) {
+            add_card(&res, i, 4);
+            return res;
+        }
+    }
+    if(can_take_card(hand, c_BlackJoker, 1) && can_take_card(hand, c_RedJoker, 1)) {
+        add_card(&res, c_BlackJoker, 1);
+        add_card(&res, c_RedJoker, 1);
+        return res;
+    }
+    //
+    return 0;
+}
