@@ -1,6 +1,6 @@
 /*
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-20 15:33:09
+ * @LastEditTime : 2022-02-20 15:41:49
  * @LastEditors  : KnightZJ
  * @Description  : poker source file
  */
@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 const Card cSingle[15] = {
     0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80, 0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000
@@ -126,11 +127,11 @@ int move_card(CardsGroup* dest, CardsGroup* source, CardType cardtype, int num) 
     return take_card(source, cardtype, num) && add_card(dest, cardtype, num);
 }
 
-int check_sequence(CardsGroup cards, int len) {
+CardsGroup check_sequence(CardsGroup cards, int len) {
     CardsGroup test = (1<<len)-1;
     while(test <= 0xfffULL) {
         if((test & cards) == test)
-            return 1;
+            return test;
         test <<= 1;
     }
     return 0;
@@ -189,7 +190,7 @@ CardsGroupInfo get_cards_info(CardsGroup cards) {
             break;
         case 12:
             if(check_sequence(threes, 3) && !check_sequence(threes, 4)&& (cntThree - 3)*3 + cntDouble * 2 + cntSingle == 3)
-                return (CardsGroupInfo){.type = cg_AirplaneWithSingles, .sequence_cnt = 3, .sequence = threes};
+                return (CardsGroupInfo){.type = cg_AirplaneWithSingles, .sequence_cnt = 3, .sequence = check_sequence(threes, 3)};
             break;
         case 15:
             if(check_sequence(threes, 3) && cntDouble == 3)
@@ -197,13 +198,13 @@ CardsGroupInfo get_cards_info(CardsGroup cards) {
             break;
         case 16:
             if(check_sequence(threes, 4) && !check_sequence(threes, 5) && (cntThree - 4)*3 + cntDouble * 2 + cntSingle == 4)
-                return (CardsGroupInfo){.type = cg_AirplaneWithSingles, .sequence_cnt = 4, .sequence = threes};
+                return (CardsGroupInfo){.type = cg_AirplaneWithSingles, .sequence_cnt = 4, .sequence = check_sequence(threes, 4)};
             break;
         case 20:
             if(check_sequence(threes, 4) && doubles == 4)
                 return (CardsGroupInfo){.type = cg_AirplaneWithDoubles, .sequence_cnt = 4, .sequence = threes};
             if(check_sequence(threes, 5) && !check_sequence(threes, 6) && (cntThree - 5)*3 + cntDouble * 2 + cntSingle == 5)
-                return (CardsGroupInfo){.type = cg_AirplaneWithDoubles, .sequence_cnt = 5, .sequence = threes};;
+                return (CardsGroupInfo){.type = cg_AirplaneWithDoubles, .sequence_cnt = 5, .sequence = check_sequence(threes, 5)};;
             break;
     }
     return (CardsGroupInfo){.type = cg_Invalid};
