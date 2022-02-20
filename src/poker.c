@@ -1,6 +1,6 @@
 /*
  * @Author       : KnightZJ
- * @LastEditTime : 2022-02-20 15:41:49
+ * @LastEditTime : 2022-02-20 18:51:45
  * @LastEditors  : KnightZJ
  * @Description  : poker source file
  */
@@ -307,6 +307,10 @@ CardsGroup recommend_cards(CardsGroup last, CardsGroup hand, int seconds_limit) 
     for(int i = 0; i < 13; ++i) {
         if(can_take_card(hand, i, 4)) {
             add_card(&res, i, 4);
+            if(judge(last, res) != jr_Bigger) {
+                res = 0;
+                continue;
+            }
             return res;
         }
     }
